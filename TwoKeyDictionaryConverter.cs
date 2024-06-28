@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using VRCFaceTracking.Babble.Collections;
 
 namespace VRCFaceTracking.Babble;
 
@@ -11,33 +10,35 @@ public class TwoKeyDictionaryConverter<TKey1, TKey2, TValue> : JsonConverter<Two
 
 	public override bool CanWrite => true;
 
-	public override void WriteJson(JsonWriter writer, TwoKeyDictionary<TKey1, TKey2, TValue> tkd, JsonSerializer serializer)
+	public override void WriteJson(JsonWriter writer, TwoKeyDictionary<TKey1, TKey2, TValue> tkd,
+		JsonSerializer serializer)
 	{
-		List<JObject> list = new List<JObject>();
-		for (int i = 0; i < tkd.Count; i++)
+		var list = new List<JObject>();
+		for (var i = 0; i < tkd.Count; i++)
 		{
-			(TKey1, TKey2, TValue) tuple = tkd.ElementAt(i);
-			JObject item = new JObject(new JProperty("unifiedExpression", tuple.Item1.ToString()), new JProperty("oscAddress", tuple.Item2), new JProperty("weight", tuple.Item3));
+			var tuple = tkd.ElementAt(i);
+			var item = new JObject(new JProperty("unifiedExpression", tuple.Item1.ToString()),
+				new JProperty("oscAddress", tuple.Item2), new JProperty("weight", tuple.Item3));
 			list.Add(item);
 		}
+
 		serializer.Serialize(writer, list);
 	}
 
-	public override TwoKeyDictionary<TKey1, TKey2, TValue> ReadJson(JsonReader reader, Type objectType, TwoKeyDictionary<TKey1, TKey2, TValue> existingValue, bool hasExistingValue, JsonSerializer serializer)
+	public override TwoKeyDictionary<TKey1, TKey2, TValue> ReadJson(JsonReader reader, Type objectType,
+		TwoKeyDictionary<TKey1, TKey2, TValue> existingValue, bool hasExistingValue, JsonSerializer serializer)
 	{
-		List<JObject> list = serializer.Deserialize<List<JObject>>(reader);
-		if (list == null)
+		var list = serializer.Deserialize<List<JObject>>(reader);
+		if (list == null) return null;
+		var twoKeyDictionary = new TwoKeyDictionary<TKey1, TKey2, TValue>();
+		foreach (var item in list)
 		{
-			return null;
-		}
-		TwoKeyDictionary<TKey1, TKey2, TValue> twoKeyDictionary = new TwoKeyDictionary<TKey1, TKey2, TValue>();
-		foreach (JObject item in list)
-		{
-			TKey1 key = (TKey1)Enum.Parse(typeof(TKey1), item["unifiedExpression"].Value<string>());
-			TKey2 key2 = item["oscAddress"].Value<TKey2>();
-			TValue value = item["weight"].Value<TValue>();
+			var key = (TKey1)Enum.Parse(typeof(TKey1), item["unifiedExpression"].Value<string>());
+			var key2 = item["oscAddress"].Value<TKey2>();
+			var value = item["weight"].Value<TValue>();
 			twoKeyDictionary.Add(key, key2, value);
 		}
+
 		return twoKeyDictionary;
 	}
 }
