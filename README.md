@@ -1,3 +1,5 @@
+# REPO HAS BEEN ARCHIVED SINCE IT HAS BEEN DONE BY TIGERSUNIVERSE. PLEASE USE https://github.com/TigersUniverse/VRCFT-Babble
+
 # VRCFT-Babble Module
 
 [Project Babble](https://github.com/SummerSigh/ProjectBabble) Module
